@@ -3,3 +3,6 @@ TGT_CXXFLAGS	+= -I./rtos -I.
 
 #LD		= $(CC)		# For C projects (default)
 #LD		= $(CXX)	# For C++ projects
+
+TGT_CFLAGS	+= -I./rtos -I. -I./project/libraries/Hardware  # Добавляем путь к uIP
+TGT_CXXFLAGS	+= -I./rtos -I. -I.project/libraries/Hardware

@@ -1,20 +1,50 @@
-#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/spi.h>
+#include <libopencm3/stm32/rcc.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include "enc28j60_spi.h"
+#include "enc28j60.h"  // Библиотека от IOsetting
 
-void spi_setup(void) {
-    // Включаем тактирование SPI и GPIO
-    rcc_periph_clock_enable(RCC_SPI1);
-    rcc_periph_clock_enable(RCC_GPIOA);
+#define LED_PORT GPIOC
+#define LED_PIN  GPIO13
 
-    // Настройка GPIO для SPI
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO5 | GPIO7); // SCK и MOSI
-    gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO6); // MISO
+static void net_task(void *arg) {
+    (void)arg;
 
-    // Настройка SPI
-    spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_1, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPI1);
-    spi_set_nss_high(SPI1);
-    spi_enable(SPI1);
+    uint8_t buffer[ENC28J60_MAXFRAME];
+    uint16_t len;
+
+    while (1) {
+        len = enc28j60_packetReceive(ENC28J60_MAXFRAME, buffer);
+        if (len > 0) {
+            if (strstr((char*)buffer, "Led on")) {
+                gpio_clear(LED_PORT, LED_PIN);
+            } else if (strstr((char*)buffer, "Led off")) {
+                gpio_set(LED_PORT, LED_PIN);
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+int main(void) {
+    // Тактирование
+    rcc_clock_setup_in_hse_8mhz_out_72mhz();
+    rcc_periph_clock_enable(RCC_GPIOC);
+
+    // Настройка LED (PC13)
+    gpio_set_mode(LED_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, LED_PIN);
+    gpio_set(LED_PORT, LED_PIN);
+
+    // Инициализация SPI и ENC28J60
+    enc28j60_spi_init();
+    enc28j60_init((uint8_t[]){0x00, 0x1A, 0x2B, 0x3C, 0x4D, 0x5E}); // MAC-адрес
+
+    // Создание задачи обработки сетевых пакетов
+    xTaskCreate(net_task, "NetTask", 256, NULL, 1, NULL);
+
+    // Запуск FreeRTOS
+    vTaskStartScheduler();
+
+    while (1);
 }

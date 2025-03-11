@@ -6,3 +6,5 @@
 *.a
 *.hex
 *.ov
+
+libopenmc3/*

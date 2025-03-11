@@ -108,12 +108,12 @@ int encoder_read(void) {
     int delta = 0.0;
 
     //  CLK==0 and DT==0 => state=0
-    //  CLK==0 and DT==1 => state=1
-    //  CLK==1 and DT==0 => state=2
+    //  CLK==1 and DT==0 => state=1
+    //  CLK==0 and DT==1 => state=2
     //  CLK==1 and DT==1 => state=3
 
-    // clockwise 0->2->3->1->0
-    //counterclockwise 0->1->3->2->0
+    // clockwise 0->1->3->2->0
+    // counterclockwise 0->2->3->1->0
 
     if (state != last_state) {
         if (last_state == 1 && state == 3) delta = 1;
@@ -231,66 +231,3 @@ int main(void) {
     while (1);
     return 0;
 }
-/*
-#include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/gpio.h>
-#include <libopencm3/stm32/usart.h>
-
-void uart_setup(void) {
-    rcc_periph_clock_enable(RCC_USART1);
-    rcc_periph_clock_enable(RCC_GPIOA);
-
-    gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, 
-                  GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_USART1_TX);
-
-    usart_set_baudrate(USART1, 38400);
-    usart_set_databits(USART1, 8);
-    usart_set_stopbits(USART1, USART_STOPBITS_1);
-    usart_set_mode(USART1, USART_MODE_TX_RX);
-    usart_set_parity(USART1, USART_PARITY_NONE);
-    usart_set_flow_control(USART1, USART_FLOWCONTROL_NONE);
-
-    usart_enable(USART1);
-}
-
-// Отправка символа по UART
-void uart_putc(char c) {
-    usart_send_blocking(USART1, c);
-}
-
-// Отправка строки по UART
-void uart_puts(const char *s) {
-    while (*s) {
-        uart_putc(*s++);
-    }
-}
-
-// Форматированный вывод (аналог printf)
-void uart_printf(const char *fmt, ...) {
-    char buf[128];
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    va_end(args);
-    uart_puts(buf);
-}
-
-char uart_recv_char(void) {
-    while (!(USART_SR(USART1) & USART_SR_RXNE)); // Ждем, пока данные не будут получены
-    return usart_recv(USART1);
-}
-
-int main(void) {
-    rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
-    uart_setup();
-
-    uart_puts("UART test started\r\n");
-
-    while (1) {
-        char c = uart_recv_char();
-        uart_printf("Received: %c (0x%02x) \r\n", c, c); // Отладочный вывод
-    }
-
-    return 0;
-}
-*/

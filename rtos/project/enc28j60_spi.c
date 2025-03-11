@@ -7,7 +7,7 @@
 #define ENC28J60_CS_PORT    GPIOA
 #define ENC28J60_CS_PIN     GPIO4
 
-void enc28j60_spi_init(void) {
+void enc28j60_spi_init_lomc3(void) {
     // Включаем тактирование SPI1 и GPIO
     rcc_periph_clock_enable(RCC_SPI1);
     rcc_periph_clock_enable(RCC_GPIOA);
@@ -27,15 +27,15 @@ void enc28j60_spi_init(void) {
     spi_enable(ENC28J60_SPI);
 }
 
-void enc28j60_select(void) {
+void enc28j60_select_lomc3(void) {
     gpio_clear(ENC28J60_CS_PORT, ENC28J60_CS_PIN);
 }
 
-void enc28j60_deselect(void) {
+void enc28j60_deselect_lomc3(void) {
     gpio_set(ENC28J60_CS_PORT, ENC28J60_CS_PIN);
 }
 
-uint8_t enc28j60_spi_transfer(uint8_t data) {
+uint8_t enc28j60_spi_transfer_lomc3(uint8_t data) {
     spi_send(ENC28J60_SPI, data);
     return spi_read(ENC28J60_SPI);
 }

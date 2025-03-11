@@ -1,4 +1,5 @@
-#include "STM32F10X_GPIO.h"
+#include "../STM32F10x_StdPeriph_Driver/inc/stm32f10x_gpio.h"
+//#include <libopencm3/stm32/gpio.h>
 
 #ifndef __ENC28J60_H
 #define __ENC28J60_H

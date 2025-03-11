@@ -6,7 +6,7 @@ PREFIX		?= arm-none-eabi
 
 TOP_DIR 	:= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 OPENCM3_DIR 	:= $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/libopencm3)
-ENC28J60_DIR	:= $(TOP_DIR)/rtos/project/libraries/Hardware
+ENC28J60_DIR 	:= $(TOP_DIR)/rtos/project/libraries/Hardware
 
 LIBNAME		= opencm3_stm32f1
 DEFS		+= -DSTM32F1
@@ -37,6 +37,10 @@ OBJS 		= $(patsubst %.cpp,%.o,$(TEMP2))
 
 LDSCRIPT	?= $(TOP_DIR)/stm32f103c8t6.ld
 
+TGT_CFLAGS 	+= -DSTM32F10X_MD
+TGT_CFLAGS += -I./libraries/CMSIS/CM3/CoreSupport
+
+
 TGT_CFLAGS	+= $(OPT) $(CSTD)
 TGT_CFLAGS	+= $(ARCH_FLAGS)
 TGT_CFLAGS	+= -Wextra -Wshadow -Wimplicit-function-declaration
@@ -44,7 +48,7 @@ TGT_CFLAGS	+= -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes
 TGT_CFLAGS	+= -fno-common -ffunction-sections -fdata-sections
 TGT_CFLAGS	+= -I$(OPENCM3_DIR)/include
 TGT_CFLAGS	+= -I$(TOP_DIR)/rtos/libwwg/include
-TGT_CFLAGS	+= -I$ ENC28J60_DIR
+TGT_CFLAGS	+= -I$(ENC28J60_DIR)
 
 TGT_CXXFLAGS	+= $(OPT) $(CXXSTD)
 TGT_CXXFLAGS	+= $(ARCH_FLAGS)

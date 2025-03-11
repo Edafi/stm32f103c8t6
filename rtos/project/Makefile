@@ -4,7 +4,7 @@
 
 BINARY		= main
 SRCFILES = 	main.c rtos/heap_4.c rtos/list.c rtos/port.c rtos/tasks.c rtos/opencm3.c rtos/queue.c \
-			libraries/Hardware/enc28j60.c /libraries/uIP-1.0/uip/uip.h
+			./libraries/Hardware/enc28j60.c ./libraries/uIP-1.0/uip/uip.c ./libraries/CMSIS/CM3/CoreSupport/core_cm3.c
 
 
 LDSCRIPT	= stm32f103c8t6.ld
